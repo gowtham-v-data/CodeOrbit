@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeOrbit</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <!-- ═══ Titlebar ═══ -->
+  <div id="titlebar">
+    <div class="titlebar-left">
+      <div class="app-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M1 3L5 1L15 5V13L11 15L1 11V3Z" fill="url(#g1)" />
+          <path d="M5 1L15 5V13L5 9V1Z" fill="url(#g2)" opacity="0.6" />
+          <defs>
+            <linearGradient id="g1" x1="1" y1="1" x2="15" y2="15">
+              <stop stop-color="#58a6ff" />
+              <stop offset="1" stop-color="#bc8cff" />
+            </linearGradient>
+            <linearGradient id="g2" x1="5" y1="1" x2="15" y2="13">
+              <stop stop-color="#fff" />
+              <stop offset="1" stop-color="#58a6ff" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="titlebar-menus">
+        <button class="titlebar-menu-item" id="menu-file">File</button>
+        <button class="titlebar-menu-item" id="menu-edit">Edit</button>
+        <button class="titlebar-menu-item" id="menu-view">View</button>
+        <button class="titlebar-menu-item" id="menu-run">Run</button>
+        <button class="titlebar-menu-item" id="menu-terminal">Terminal</button>
+        <button class="titlebar-menu-item" id="menu-help">Help</button>
+      </div>
+    </div>
+    <div class="titlebar-center" id="drag-region">
+      <span class="titlebar-title" id="window-title">CodeOrbit</span>
+    </div>
+    <div class="titlebar-controls">
+      <button class="control-btn" id="btn-minimize"><svg width="10" height="1" viewBox="0 0 10 1">
+          <rect width="10" height="1" fill="currentColor" />
+        </svg></button>
+      <button class="control-btn" id="btn-maximize"><svg width="10" height="10" viewBox="0 0 10 10">
+          <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" fill="none" stroke-width="1" />
+        </svg></button>
+      <button class="control-btn close-btn" id="btn-close"><svg width="10" height="10" viewBox="0 0 10 10">
+          <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.2" />
+        </svg></button>
+    </div>
+  </div>
+
+  <!-- ═══ Main ═══ -->
+  <div id="main-container">
+    <!-- Activity Bar -->
+    <div id="activity-bar">
+      <div class="activity-top">
+        <button class="activity-btn active" data-panel="home" title="Home">
+          <i class="fas fa-home"></i>
+        </button>
+        <button class="activity-btn" data-panel="explorer" title="Explorer (Ctrl+Shift+E)">
+          <i class="fas fa-copy"></i>
+        </button>
+        <button class="activity-btn" data-panel="search" title="Search (Ctrl+Shift+F)">
+          <i class="fas fa-search"></i>
+        </button>
+        <button class="activity-btn" data-panel="git" title="Source Control (Ctrl+Shift+G)">
+          <i class="fas fa-code-branch"></i>
+          <span class="activity-badge" id="git-badge" style="display:none;">0</span>
+        </button>
+        <button class="activity-btn" data-panel="extensions" title="Extensions">
+          <i class="fas fa-puzzle-piece"></i>
+        </button>
+        <button class="activity-btn" data-panel="copilot" title="AI Copilot (Ctrl+Shift+I)">
+          <i class="fas fa-robot"></i>
+          <span class="copilot-glow"></span>
+        </button>
+        <button class="activity-btn" data-panel="agents" title="AI Agents">
+          <i class="fas fa-brain"></i>
+          <div class="activity-badge" id="agents-badge" style="display:none;">!</div>
+        </button>
+        <button class="activity-btn" data-panel="analytics" title="Project Analytics">
+          <i class="fas fa-chart-line"></i>
+        </button>
+      </div>
+      <div class="activity-bottom">
+        <button class="activity-btn" id="btn-settings" title="Settings">
+          <i class="fas fa-cog"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <!-- Home Panel -->
+      <div id="panel-home" class="sidebar-panel active">
+        <div class="sidebar-header"><span class="sidebar-title">HOME</span></div>
+        <div class="home-container">
+          <div class="home-hero">
+            <div class="welcome-logo">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                <path d="M4 12L20 4L60 20V52L44 60L4 44V12Z" fill="url(#wg1)" />
+                <path d="M20 4L60 20V52L20 36V4Z" fill="url(#wg2)" opacity="0.5" />
+                <defs>
+                  <linearGradient id="wg1" x1="4" y1="4" x2="60" y2="60">
+                    <stop stop-color="#58a6ff" />
+                    <stop offset="1" stop-color="#bc8cff" />
+                  </linearGradient>
+                  <linearGradient id="wg2" x1="20" y1="4" x2="60" y2="52">
+                    <stop stop-color="#fff" />
+                    <stop offset="1" stop-color="#58a6ff" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <h3>CodeOrbit</h3>
+            <p>Your workspace for the future</p>
+          </div>
+          <div class="home-section">
+            <h4>Quick Actions</h4>
+            <div class="home-action-list">
+              <button class="home-action-btn" id="btn-home-open"><i class="fas fa-folder-open"></i> Open Folder</button>
+              <button class="home-action-btn" id="btn-home-new"><i class="fas fa-file-circle-plus"></i> New
+                File</button>
+            </div>
+          </div>
+          <div class="home-section">
+            <h4>Common Shortcuts</h4>
+            <div class="home-shortcut-grid">
+              <div class="shortcut-item"><span>Open File</span><kbd>Ctrl+O</kbd></div>
+              <div class="shortcut-item"><span>New File</span><kbd>Ctrl+N</kbd></div>
+              <div class="shortcut-item"><span>Command Palette</span><kbd>Ctrl+P</kbd></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explorer Panel -->
+      <div id="panel-explorer" class="sidebar-panel">
+        <div class="sidebar-header"><span class="sidebar-title">EXPLORER</span></div>
+        <div id="folder-header" class="folder-header" style="display:none;">
+          <div class="folder-header-name">
+            <i class="fas fa-chevron-down folder-header-chevron"></i>
+            <span id="folder-name-text">PROJECT</span>
+          </div>
+          <div class="folder-header-actions">
+            <button class="icon-btn" id="btn-new-file-sidebar" title="New File"><i
+                class="fas fa-file-circle-plus"></i></button>
+            <button class="icon-btn" id="btn-new-folder-sidebar" title="New Folder"><i
+                class="fas fa-folder-plus"></i></button>
+            <button class="icon-btn" id="btn-refresh" title="Refresh"><i class="fas fa-rotate"></i></button>
+            <button class="icon-btn" id="btn-collapse-all" title="Collapse All"><i
+                class="fas fa-compress-alt"></i></button>
+          </div>
+        </div>
+        <div id="file-tree" class="file-tree">
+          <div class="empty-state" id="empty-state">
+            <p class="empty-text">You have not yet opened a folder.</p>
+            <button class="primary-btn" id="btn-open-folder-main">Open Folder</button>
+          </div>
+        </div>
+        <!-- Open Editors -->
+        <div id="open-editors-section" class="sidebar-section">
+          <div class="section-header" id="open-editors-toggle">
+            <i class="fas fa-chevron-down section-chevron"></i>
+            <span>OPEN EDITORS</span>
+            <span class="badge" id="open-editors-count">0</span>
+          </div>
+          <div id="open-editors-list" class="section-content"></div>
+        </div>
+      </div>
+
+      <!-- Git Panel -->
+      <div id="panel-git" class="sidebar-panel">
+        <div class="sidebar-header"><span class="sidebar-title">SOURCE CONTROL</span></div>
+        <div id="git-content" class="git-panel">
+          <div id="git-not-repo" class="git-empty">
+            <p>No Git repository detected.</p>
+            <button class="primary-btn" id="btn-git-init">Initialize Repository</button>
+          </div>
+          <div id="git-repo" style="display:none;">
+            <!-- Commit input -->
+            <div class="git-commit-area">
+              <input type="text" id="git-commit-input" class="git-input" placeholder="Message (Ctrl+Enter to commit)" />
+              <button class="git-commit-btn" id="btn-git-commit" title="Commit">
+                <i class="fas fa-check"></i>
+              </button>
+            </div>
+            <!-- Staged Changes -->
+            <div class="git-section">
+              <div class="git-section-header" id="toggle-staged">
+                <i class="fas fa-chevron-down section-chevron"></i>
+                <span>STAGED CHANGES</span>
+                <span class="badge" id="staged-count">0</span>
+                <button class="icon-btn git-action" id="btn-unstage-all" title="Unstage All"><i
+                    class="fas fa-minus"></i></button>
+              </div>
+              <div id="git-staged-list" class="git-file-list"></div>
+            </div>
+            <!-- Changes -->
+            <div class="git-section">
+              <div class="git-section-header" id="toggle-changes">
+                <i class="fas fa-chevron-down section-chevron"></i>
+                <span>CHANGES</span>
+                <span class="badge" id="changes-count">0</span>
+                <button class="icon-btn git-action" id="btn-stage-all" title="Stage All"><i
+                    class="fas fa-plus"></i></button>
+              </div>
+              <div id="git-changes-list" class="git-file-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Panel -->
+      <div id="panel-search" class="sidebar-panel">
+        <div class="sidebar-header"><span class="sidebar-title">SEARCH</span></div>
+        <div class="search-panel-content">
+          <div class="search-input-wrap">
+            <input type="text" id="search-input" class="search-input" placeholder="Search files..." />
+            <div class="search-options">
+              <button class="search-opt-btn" id="search-case" title="Match Case"><i class="fas fa-font"></i></button>
+              <button class="search-opt-btn" id="search-regex" title="Use Regular Expression"><i class="fas fa-asterisk"></i></button>
+            </div>
+          </div>
+          <div id="search-results" class="search-results"></div>
+        </div>
+      </div>
+
+      <!-- Extensions Panel -->
+      <div id="panel-extensions" class="sidebar-panel">
+        <div class="sidebar-header" style="justify-content:space-between;">
+          <span class="sidebar-title">EXTENSIONS</span>
+          <div class="ext-header-actions">
+            <button class="icon-btn" id="btn-ext-refresh" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+          </div>
+        </div>
+        <div class="ext-search-wrap">
+          <i class="fas fa-search ext-search-icon"></i>
+          <input type="text" id="ext-search" class="ext-search-input"
+            placeholder="Search Extensions in Marketplace..." />
+        </div>
+        <div class="ext-tabs">
+          <button class="ext-tab active" data-tab="marketplace">Marketplace</button>
+          <button class="ext-tab" data-tab="installed">Installed <span class="ext-tab-badge"
+              id="installed-count">0</span></button>
+        </div>
+        <div id="ext-marketplace" class="ext-list active"></div>
+        <div id="ext-installed" class="ext-list"></div>
+        <!-- Extension Detail View -->
+        <div id="ext-detail" class="ext-detail" style="display:none;">
+          <button class="ext-detail-back" id="ext-detail-back"><i class="fas fa-arrow-left"></i> Back</button>
+          <div id="ext-detail-content"></div>
+        </div>
+      </div>
+
+      <!-- AI Copilot Panel -->
+      <div id="panel-copilot" class="sidebar-panel">
+        <div class="sidebar-header copilot-header">
+          <span class="sidebar-title"><i class="fas fa-robot copilot-icon-glow"></i> AI COPILOT</span>
+          <div class="copilot-header-actions">
+            <button class="icon-btn" id="btn-copilot-clear" title="Clear Chat"><i class="fas fa-broom"></i></button>
+            <button class="icon-btn" id="btn-copilot-settings" title="Settings"><i
+                class="fas fa-sliders-h"></i></button>
+            <button class="icon-btn" id="btn-copilot-close" title="Close Copilot"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="copilot-quick-actions">
+          <button class="copilot-action-chip" data-action="fix-errors" title="Fix Errors">
+            <i class="fas fa-bug"></i> Fix Errors
+          </button>
+          <button class="copilot-action-chip" data-action="explain" title="Explain Code">
+            <i class="fas fa-lightbulb"></i> Explain
+          </button>
+          <button class="copilot-action-chip" data-action="refactor" title="Refactor">
+            <i class="fas fa-recycle"></i> Refactor
+          </button>
+          <button class="copilot-action-chip" data-action="generate-docs" title="Generate Docs">
+            <i class="fas fa-book"></i> Docs
+          </button>
+          <button class="copilot-action-chip" data-action="generate-tests" title="Generate Tests">
+            <i class="fas fa-vial"></i> Tests
+          </button>
+          <button class="copilot-action-chip" data-action="review" title="Code Review">
+            <i class="fas fa-search-plus"></i> Review
+          </button>
+          <button class="copilot-action-chip" data-action="optimize" title="Optimize Code">
+            <i class="fas fa-tachometer-alt"></i> Optimize
+          </button>
+          <button class="copilot-action-chip" data-action="convert" title="Convert Language">
+            <i class="fas fa-exchange-alt"></i> Convert
+          </button>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="copilot-messages" class="copilot-messages">
+          <div class="copilot-welcome-msg">
+            <div class="copilot-avatar-large">
+              <i class="fas fa-robot"></i>
+            </div>
+            <h3>Hi! I'm your AI Copilot</h3>
+            <p>I can help you write, fix, explain, and optimize code. Ask me anything or use the quick actions above!
+            </p>
+            <div class="copilot-suggestions">
+              <button class="copilot-suggestion" data-prompt="Help me fix the errors in my code">🔧 Fix my code</button>
+              <button class="copilot-suggestion" data-prompt="Explain this code step by step">📖 Explain this
+                code</button>
+              <button class="copilot-suggestion" data-prompt="Suggest improvements for my code">💡 Improve my
+                code</button>
+              <button class="copilot-suggestion" data-prompt="Write unit tests for this code">🧪 Write tests</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="copilot-input-area">
+          <div class="copilot-input-context" id="copilot-input-context" style="display:none;">
+            <i class="fas fa-code"></i>
+            <span id="copilot-context-label">Selection attached</span>
+            <button class="copilot-context-remove" id="copilot-context-remove">✕</button>
+          </div>
+          <div class="copilot-input-wrap">
+            <textarea id="copilot-input" class="copilot-input" placeholder="Ask AI Copilot anything..."
+              rows="1"></textarea>
+            <div class="copilot-input-buttons">
+              <button class="copilot-icon-mini-btn" id="btn-copilot-voice" title="Voice Search">
+                <i class="fas fa-microphone"></i>
+              </button>
+              <button class="copilot-send-btn" id="copilot-send" title="Send (Enter)">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Voice Listening Overlay -->
+          <div id="copilot-voice-overlay" class="voice-overlay" style="display:none;">
+            <div class="voice-pulse-circle"></div>
+            <i class="fas fa-microphone-lines voice-icon-large"></i>
+            <h3>Listening to you...</h3>
+            <p id="voice-transcript-live">Try saying: "Create a main.py file"</p>
+            <button class="voice-cancel-btn" id="btn-voice-stop">Stop Listening</button>
+          </div>
+          <div class="copilot-input-footer">
+            <span class="copilot-model-badge" id="copilot-model-badge">Gemini 2.0 Flash</span>
+            <span class="copilot-hint">Enter to send · Shift+Enter for newline</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agents Panel -->
+      <div id="panel-agents" class="sidebar-panel">
+        <div class="sidebar-header">
+          <span class="sidebar-title"><i class="fas fa-brain" style="color:#f472b6;margin-right:8px;"></i> AI
+            AGENTS</span>
+          <div class="copilot-header-actions">
+            <button class="icon-btn" id="btn-agents-refresh" title="Reset Agents"><i class="fas fa-rotate"></i></button>
+            <button class="icon-btn" id="btn-agents-close" title="Close Panel"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div class="agents-container">
+          <div class="agents-welcome">
+            <div class="agents-hero-icon-wrap">
+              <i class="fas fa-microchip agents-hero-icon"></i>
+            </div>
+            <h3>Autonomous Agents</h3>
+            <p>Advanced AI workers that can perform complex, multi-step operations on your behalf.</p>
+          </div>
+
+          <div class="agent-card" data-agent="architect">
+            <div class="agent-icon-wrap architect"><i class="fas fa-city"></i></div>
+            <div class="agent-info">
+              <div class="agent-name-row">
+                <h4>Project Architect</h4>
+                <span class="agent-badge">Pro</span>
+              </div>
+              <p>Generates complete project structures, boilerplate, and multiple files from a single goal.</p>
+              <button class="agent-action-btn">Launch Architect</button>
+            </div>
+          </div>
+
+          <div class="agent-card" data-agent="debugger">
+            <div class="agent-icon-wrap debugger"><i class="fas fa-bug-slash"></i></div>
+            <div class="agent-info">
+              <div class="agent-name-row">
+                <h4>Debug Master</h4>
+                <span class="agent-badge">Pro</span>
+              </div>
+              <p>Analyzes your entire project to find elusive bugs and suggest high-level fixes across modules.</p>
+              <button class="agent-action-btn" onclick="scanProjectForBugs()">Scan for Bugs</button>
+            </div>
+          </div>
+
+          <div class="agent-card" data-agent="refactorer">
+            <div class="agent-icon-wrap refactorer"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <div class="agent-info">
+              <div class="agent-name-row">
+                <h4>Refactor Pro</h4>
+              </div>
+              <p>Deeply analyzes code smells and automatically restructures code for optimal performance.</p>
+              <button class="agent-action-btn">Analyze Quality</button>
+            </div>
+          </div>
+
+          <div class="agent-card" data-agent="web-designer">
+            <div class="agent-icon-wrap webdesigner"><i class="fas fa-palette"></i></div>
+            <div class="agent-info">
+              <div class="agent-name-row">
+                <h4>Web Designer</h4>
+                <span class="agent-badge">New</span>
+              </div>
+              <p>Builds beautiful, responsive websites from scratch and previews them instantly in the sidebar.</p>
+              <button class="agent-action-btn">Create Website</button>
+            </div>
+          </div>
+
+          <div class="agent-card autonomous" data-agent="orchestrator">
+            <div class="agent-icon-wrap" style="background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;"><i
+                class="fas fa-network-wired"></i></div>
+            <div class="agent-info">
+              <div class="agent-name-row">
+                <h4>Lead Orchestrator</h4>
+                <div class="agent-collab-badge">Multi-Agent</div>
+              </div>
+              <p>The ultimate autonomous system. It hires and manages sub-agents (Architect, Coder, QA) to solve complex
+                project-wide goals.</p>
+              <button class="agent-action-btn" style="border-color:#f472b6;color:#f472b6;">Start Collaborative
+                Mission</button>
+            </div>
+          </div>
+
+          <div class="agents-status-card">
+            <div class="status-header">
+              <span class="status-dot online"></span>
+              <span>Multi-Agent System Online</span>
+            </div>
+            <div class="status-stats">
+              <div class="stat"><span class="val">4</span><span class="lbl">Total</span></div>
+              <div class="stat"><span class="val">1</span><span class="lbl">Idle</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Preview Panel -->
+      <div id="panel-preview" class="sidebar-panel">
+        <div class="sidebar-header">
+          <span class="sidebar-title"><i class="fas fa-globe" style="color:#3fb950;margin-right:8px;"></i> LIVE
+            PREVIEW</span>
+          <div class="copilot-header-actions">
+            <button class="icon-btn" id="btn-preview-refresh" title="Refresh Preview"><i
+                class="fas fa-sync-alt"></i></button>
+            <button class="icon-btn" id="btn-preview-external" title="Open in Browser"><i
+                class="fas fa-external-link-alt"></i></button>
+            <button class="icon-btn" id="btn-preview-close" title="Close Panel"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div class="preview-container">
+          <div class="preview-address-bar">
+            <div class="address-input" id="preview-url">http://localhost:5500</div>
+          </div>
+          <div class="preview-frame-wrap" id="preview-frame-wrap">
+            <div class="preview-placeholder" id="preview-placeholder">
+              <i class="fas fa-satellite-dish"></i>
+              <p>Live Server is offline</p>
+              <button class="primary-btn" id="btn-preview-start">Go Live</button>
+            </div>
+            <webview id="preview-webview" class="preview-webview" src="about:blank" style="display:none;"></webview>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Analytics Panel -->
+      <div id="panel-analytics" class="sidebar-panel">
+        <div class="sidebar-header">
+          <span class="sidebar-title"><i class="fas fa-chart-pie" style="color:#fbbf24;margin-right:8px;"></i>
+            ANALYTICS</span>
+          <div class="copilot-header-actions">
+            <button class="icon-btn" id="btn-analytics-refresh" title="Refresh Stats"><i
+                class="fas fa-sync-alt"></i></button>
+            <button class="icon-btn" id="btn-analytics-close" title="Close"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div class="analytics-container">
+          <div class="analytics-summary">
+            <div class="stat-card">
+              <span class="val" id="stat-files">0</span>
+              <span class="lbl">Files</span>
+            </div>
+            <div class="stat-card">
+              <span class="val" id="stat-lines">0</span>
+              <span class="lbl">Lines</span>
+            </div>
+          </div>
+
+          <div class="analytics-section">
+            <h4>Languages</h4>
+            <div id="lang-chart" class="lang-bar-wrap"></div>
+            <div id="lang-list" class="lang-list"></div>
+          </div>
+
+          <div class="analytics-section">
+            <h4>Git Overview</h4>
+            <div class="git-info-grid">
+              <div class="git-info-item">
+                <span class="lbl">Current Branch</span>
+                <span class="val" id="git-branch">-</span>
+              </div>
+              <div class="git-info-item">
+                <span class="lbl">Total Commits</span>
+                <span class="val" id="git-commits">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebar-resize" class="resize-handle"></div>
+
+    <!-- Editor Area -->
+    <div id="editor-area">
+      <div id="tab-bar">
+        <div id="tabs-scroll">
+          <div id="tabs-container"></div>
+        </div>
+        <div class="tab-bar-actions">
+          <select id="language-selector" title="Language Mode">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+            <option value="c">C</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="json">JSON</option>
+            <option value="markdown">Markdown</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="breadcrumb" class="breadcrumb" style="display:none;">
+        <span id="breadcrumb-content"></span>
+      </div>
+
+      <!-- Welcome -->
+      <div id="welcome-screen">
+        <div class="welcome-content">
+          <div class="welcome-logo">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <path d="M4 12L20 4L60 20V52L44 60L4 44V12Z" fill="url(#wg1)" />
+              <path d="M20 4L60 20V52L20 36V4Z" fill="url(#wg2)" opacity="0.5" />
+              <defs>
+                <linearGradient id="wg1" x1="4" y1="4" x2="60" y2="60">
+                  <stop stop-color="#58a6ff" />
+                  <stop offset="1" stop-color="#bc8cff" />
+                </linearGradient>
+                <linearGradient id="wg2" x1="20" y1="4" x2="60" y2="52">
+                  <stop stop-color="#fff" />
+                  <stop offset="1" stop-color="#58a6ff" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h1 class="welcome-title">CodeOrbit</h1>
+          <p class="welcome-subtitle">Lightweight & powerful code editor</p>
+          <div class="welcome-section">
+            <h3>Start</h3>
+            <div class="welcome-links">
+              <a class="welcome-link" id="wl-new-file"><i class="fas fa-file-circle-plus"></i> New File
+                <kbd>Ctrl+N</kbd></a>
+              <a class="welcome-link" id="wl-open-folder"><i class="fas fa-folder-open"></i> Open Folder
+                <kbd>Ctrl+O</kbd></a>
+              <a class="welcome-link" id="wl-terminal"><i class="fas fa-terminal"></i> New Terminal
+                <kbd>Ctrl+`</kbd></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="editor-container"></div>
+
+      <!-- Bottom Panel -->
+      <div id="bottom-panel-resize" class="resize-handle-h"></div>
+      <div id="bottom-panel">
+        <div class="panel-header">
+          <div class="panel-tabs">
+            <button class="panel-tab" data-panel="output"><i class="fas fa-list-alt"></i> OUTPUT</button>
+            <button class="panel-tab active" data-panel="terminal"><i class="fas fa-terminal"></i> TERMINAL</button>
+            <button class="panel-tab" data-panel="problems"><i class="fas fa-exclamation-triangle"></i>
+              PROBLEMS</button>
+          </div>
+          <div class="panel-actions">
+            <button id="btn-run" class="panel-action-btn run-btn" title="Run (F5)"><i class="fas fa-play"></i> Run</button>
+          <button id="btn-run-term" class="panel-action-btn" title="Run in Terminal"><i class="fas fa-terminal" style="color:var(--blue)"></i> Terminal</button>
+          <button id="btn-stop" class="panel-action-btn stop-btn" style="display:none;" title="Stop"><i class="fas fa-stop"></i> Stop</button>
+            <button class="panel-action-btn" id="btn-new-terminal" title="New Terminal"><i
+                class="fas fa-plus"></i></button>
+            <button class="panel-action-btn" id="btn-kill-terminal" title="Kill Terminal"><i
+                class="fas fa-trash-can"></i></button>
+            <button class="panel-action-btn" id="btn-clear" title="Clear"><i class="fas fa-ban"></i></button>
+            <button class="panel-action-btn" id="btn-toggle-panel" title="Toggle Panel"><i
+                class="fas fa-chevron-down"></i></button>
+          </div>
+        </div>
+        <!-- Output view -->
+        <div id="output-content" class="panel-view" style="display:none;">
+          <div id="output-lines">
+            <div class="output-placeholder"><span>Press <kbd>F5</kbd> to run your code</span></div>
+          </div>
+          <div id="output-input-area" class="output-input-area" style="display:none;">
+            <i class="fas fa-chevron-right"></i>
+            <input type="text" id="output-input-field" placeholder="Type here and press Enter to send input..." />
+          </div>
+        </div>
+        <!-- Terminal view -->
+        <div id="terminal-container" class="panel-view active">
+          <div id="terminal-tabs" class="terminal-tabs"></div>
+          <div id="terminal-views" class="terminal-views"></div>
+        </div>
+        <!-- Problems view -->
+        <div id="problems-content" class="panel-view" style="display:none;">
+          <div class="output-placeholder"><span>No problems detected</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="status-bar">
+    <div class="status-left">
+      <span class="status-item status-remote" id="status-remote"><i class="fas fa-broadcast-tower"
+          style="font-size:10px;"></i></span>
+      <span class="status-item" id="status-branch"><i class="fas fa-code-branch"></i> <span
+          id="branch-name">main</span></span>
+      <span class="status-item" id="status-sync"><i class="fas fa-sync-alt"></i> 0↓ 0↑</span>
+      <span class="status-item" id="status-errors"><i class="fas fa-times-circle"></i> 0 <i
+          class="fas fa-exclamation-triangle" style="margin-left:4px"></i> 0</span>
+    </div>
+    <div class="status-right">
+      <span class="status-item copilot-status" id="copilot-status" title="AI Copilot">
+        <span class="copilot-status-dot"></span>
+        <i class="fas fa-robot" style="font-size:10px;"></i> Copilot
+      </span>
+      <span class="status-item live-server-btn" id="btn-go-live" title="Start Live Server">
+        <i class="fas fa-satellite-dish"></i> Go Live
+      </span>
+      <span class="status-item" id="status-cursor">Ln 1, Col 1</span>
+      <span class="status-item" id="status-spaces">Spaces: 4</span>
+      <span class="status-item" id="status-encoding">UTF-8</span>
+      <span class="status-item" id="status-eol">CRLF</span>
+      <span class="status-item" id="status-language">Python</span>
+      <span class="status-item" id="status-bell"><i class="fas fa-bell"></i></span>
+    </div>
+  </div>
+
+  <div id="dropdown-menu" class="dropdown-menu" style="display:none;"></div>
+  <div id="notification-container"></div>
+
+  <!-- AI Copilot Inline Widget -->
+  <div id="copilot-inline-widget" class="copilot-inline-widget" style="display:none;">
+    <button class="copilot-inline-btn" data-action="fix-errors" title="Fix Errors"><i class="fas fa-bug"></i></button>
+    <button class="copilot-inline-btn" data-action="explain" title="Explain"><i class="fas fa-lightbulb"></i></button>
+    <button class="copilot-inline-btn" data-action="refactor" title="Refactor"><i class="fas fa-recycle"></i></button>
+    <button class="copilot-inline-btn" data-action="generate-docs" title="Docs"><i class="fas fa-book"></i></button>
+    <button class="copilot-inline-btn" data-action="generate-tests" title="Tests"><i class="fas fa-vial"></i></button>
+    <button class="copilot-inline-btn" data-action="ask" title="Ask AI"><i class="fas fa-comment-dots"></i></button>
+  </div>
+
+  <!-- CodeOrbit Settings Modal -->
+  <div id="copilot-settings-overlay" class="command-palette-overlay" style="display:none;">
+    <div class="copilot-settings-modal" style="max-width:500px;">
+      <div class="copilot-settings-header">
+        <h3><i class="fas fa-cog copilot-icon-glow"></i> CodeOrbit Settings</h3>
+        <button class="copilot-settings-close" id="copilot-settings-close">✕</button>
+      </div>
+      <div class="copilot-settings-body">
+        <div class="settings-tabs"
+          style="display:flex;gap:12px;margin-bottom:16px;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
+          <button class="tab-btn active" data-tab="ai">AI Copilot</button>
+          <button class="tab-btn" data-tab="layout">Layout & Appearance</button>
+        </div>
+
+        <div id="settings-ai-tab" class="tab-pane active">
+          <div class="copilot-setting-group">
+            <label class="copilot-setting-label">API Provider</label>
+            <select id="copilot-api-provider" class="copilot-setting-select">
+              <option value="gemini" selected>Google Gemini</option>
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic Claude</option>
+              <option value="openrouter">OpenRouter</option>
+            </select>
+          </div>
+          <div class="copilot-setting-group">
+            <label class="copilot-setting-label">API Key</label>
+            <div class="copilot-api-key-wrap">
+              <input type="password" id="copilot-api-key" class="copilot-setting-input"
+                placeholder="Enter your API key..." />
+              <button class="copilot-toggle-key" id="copilot-toggle-key"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
+          <div class="copilot-setting-group">
+            <label class="copilot-setting-label">Model</label>
+            <select id="copilot-model" class="copilot-setting-select">
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+              <option value="gemini-2.0-pro">Gemini 2.0 Pro</option>
+              <option value="gpt-4o-mini">GPT-4o Mini</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="settings-layout-tab" class="tab-pane" style="display:none;">
+          <div class="copilot-setting-group">
+            <label class="copilot-setting-label">Sidebar Position</label>
+            <select id="setting-sidebar-side" class="copilot-setting-select">
+              <option value="left" selected>Left (Default)</option>
+              <option value="right">Right (Modern)</option>
+            </select>
+          </div>
+          <div class="copilot-setting-group">
+            <label class="copilot-setting-label">Color Theme</label>
+            <select id="setting-theme-mode" class="copilot-setting-select">
+              <option value="dark" selected>Dark (Default)</option>
+              <option value="light">Light (Classic)</option>
+            </select>
+          </div>
+          <div class="copilot-setting-group">
+            <label class="copilot-setting-label">Theme Accent</label>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <div class="accent-dot" data-color="#58a6ff"
+                style="background:#58a6ff;width:24px;height:24px;border-radius:50%;cursor:pointer;"></div>
+              <div class="accent-dot" data-color="#3fb950"
+                style="background:#3fb950;width:24px;height:24px;border-radius:50%;cursor:pointer;"></div>
+              <div class="accent-dot" data-color="#fbbf24"
+                style="background:#fbbf24;width:24px;height:24px;border-radius:50%;cursor:pointer;"></div>
+              <div class="accent-dot" data-color="#f472b6"
+                style="background:#f472b6;width:24px;height:24px;border-radius:50%;cursor:pointer;"></div>
+            </div>
+          </div>
+          <div class="copilot-setting-group">
+            <label class="copilot-setting-label">Font Family</label>
+            <select id="setting-font-family" class="copilot-setting-select">
+              <option value="JetBrains Mono" selected>JetBrains Mono</option>
+              <option value="Inter">Inter (General)</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="primary-btn copilot-save-settings" id="copilot-save-settings" style="margin-top:12px;">
+          <i class="fas fa-save" style="margin-right:8px;"></i> Apply Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Palette -->
+  <div id="command-palette-overlay" class="command-palette-overlay" style="display:none;">
+    <div class="command-palette">
+      <input type="text" id="command-palette-input" placeholder="> Type a command..." />
+      <div id="command-palette-list" class="command-palette-list"></div>
+    </div>
+  </div>
+
+  <!-- Dropdown Menu Container -->
+  <div id="dropdown-menu" class="dropdown-menu"></div>
+
+  <!-- Monaco + App loader -->
+  <script>
+    window.nodeRequire = require;
+    delete window.require; delete window.exports; delete window.module;
+  </script>
+  <script src="node_modules/monaco-editor/min/vs/loader.js"></script>
+  <script>
+    // 1. Load Renderer immediately for UI responsiveness
+    const s = document.createElement("script");
+    s.src = "renderer.js";
+    s.onload = function () {
+      const c = document.createElement("script");
+      c.src = "copilot.js";
+      document.body.appendChild(c);
+      
+      // 2. Initialize Monaco Editor in the background
+      require.config({ paths: { vs: "node_modules/monaco-editor/min/vs" } });
+      require(["vs/editor/editor.main"], function () {
+        console.log("🎨 Monaco Loaded — Initializing Editor...");
+        if (window.onMonacoReady) window.onMonacoReady();
+      });
+    };
+    document.body.appendChild(s);
+  </script>
+</body>
+
+</html>

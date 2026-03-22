@@ -1,0 +1,74 @@
+{
+  "name": "codeorbit-ide",
+  "version": "2.2.0",
+  "description": "🎋 CodeOrbit IDE — Professional Desktop Code Editor with Terminal & Git",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "build:portable": "electron-builder --win portable",
+    "package": "npx electron-packager . CodeOrbit --overwrite --platform=win32 --arch=x64"
+  },
+  "build": {
+    "appId": "com.gowtham.ide",
+    "productName": "CodeOrbit",
+    "copyright": "Copyright © 2026 Gowtham Sanjay",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "copilot.js",
+      "index.html",
+      "styles.css",
+      "renderer.js",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "icon.png",
+      "uninstallerIcon": "icon.png",
+      "installerHeaderIcon": "icon.png",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CodeOrbit"
+    }
+  },
+  "keywords": [
+    "ide",
+    "editor",
+    "electron",
+    "monaco",
+    "terminal",
+    "git"
+  ],
+  "author": "Gowtham Sanjay",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "electron": "^41.0.3",
+    "monaco-editor": "^0.55.1",
+    "node-pty": "^1.1.0",
+    "simple-git": "^3.33.0",
+    "ws": "^8.19.0",
+    "xterm": "^4.19.0",
+    "xterm-addon-fit": "^0.5.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^26.8.1",
+    "electron-rebuild": "^3.2.9"
+  }
+}
